@@ -22,6 +22,7 @@
 #include <core/gp_debug.h>
 #include <core/gp_gamma_correction.h>
 
+#include <loaders/gp_io.h>
 #include <loaders/gp_line_convert.h>
 #include <loaders/gp_loaders.gen.h>
 
@@ -668,7 +669,7 @@ int gp_match_png(const void GP_UNUSED(*buf))
 	return 1;
 }
 
-int gp_read_png_ex(GP_IO GP_UNUSED(*io), gp_pixmap GP_UNUSED(**img),
+int gp_read_png_ex(gp_io GP_UNUSED(*io), gp_pixmap GP_UNUSED(**img),
                  gp_storage GP_UNUSED(*storage),
                  gp_progress_cb GP_UNUSED(*callback))
 {
@@ -676,7 +677,7 @@ int gp_read_png_ex(GP_IO GP_UNUSED(*io), gp_pixmap GP_UNUSED(**img),
 	return 1;
 }
 
-int gp_write_png(const gp_pixmap *src, GP_IO GP_UNUSED(*io),
+int gp_write_png(const gp_pixmap *src, gp_io GP_UNUSED(*io),
                 gp_progress_cb *callback)
 {
 	errno = ENOSYS;
