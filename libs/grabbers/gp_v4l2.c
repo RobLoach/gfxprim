@@ -19,8 +19,8 @@
 
 #include <stdint.h>
 
-#include "core/gp_pixmap.h"
-
+#include <core/gp_pixmap.h>
+#include <grabbers/gp_grabber.h>
 #include <core/gp_debug.h>
 
 #ifndef GFXPRIM_NO_CONFIG
@@ -31,7 +31,6 @@
 
 #include <linux/videodev2.h>
 
-#include <grabbers/gp_grabber.h>
 #include <grabbers/gp_v4l2.h>
 
 struct v4l2_priv {
