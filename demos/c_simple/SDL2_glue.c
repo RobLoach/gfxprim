@@ -49,11 +49,12 @@ void event_loop(void)
 
 	while (SDL_WaitEvent(&event) > 0) {
 		switch (event.type) {
-
-		// case SDL_VIDEOEXPOSE:
-		// 	redraw_screen();
-		// 	SDL_Flip(display);
-		// break;
+		case SDL_WINDOWEVENT:
+			if (event.window.event == SDL_WINDOWEVENT_EXPOSED) {
+				redraw_screen();
+				SDL_UpdateWindowSurface(window);
+			}
+		break;
 
 		case SDL_KEYDOWN:
 			switch (event.key.keysym.sym) {
@@ -77,7 +78,7 @@ int main(void)
 		return 1;
 	}
 
-	window = SDL_CreateWindow("GFXprim SDL2", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, W, H, 0);
+	window = SDL_CreateWindow("GFXprim SDL2", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, W, H, SDL_WINDOW_RESIZABLE);
 	if (window == NULL) {
 		fprintf(stderr, "Could not open window: %s\n", SDL_GetError());
 		SDL_Quit();
