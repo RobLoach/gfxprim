@@ -20,7 +20,6 @@
 #include <backends/gp_sdl2_pixmap.h>
 
 #include <SDL2/SDL.h>
-//#include <SDL2/SDL_mutex.h>
 
 static SDL_Window *window;
 static SDL_Renderer *renderer;
@@ -49,23 +48,8 @@ static void sdl2_update_rect(struct gp_backend *self __attribute__((unused)),
 {
 	SDL_LockMutex(mutex);
 
-	/*
-	 * SDL_UpdateRect() with all x0, y0, x1 and y1 zero updates whole
-	 * screen we avoid such behavior as it will break other backends.
-	 */
-	//if (x1 != 0 && y1 != 0)
-		//SDL_UpdateRect(sdl_surface, x0, y0,
-	//	               GP_ABS(x1 - x0) + 1, GP_ABS(y1 - y0) + 1);
-
-
-			const SDL_Rect rect = (SDL_Rect){x0, y0, GP_ABS(x1 - x0) + 1, GP_ABS(y1 - y0) + 1};
-			//SDL_RenderCopy(renderer, sdl2_texture, &rect, NULL);
-
-
-			
-			SDL_UpdateWindowSurfaceRects(window, &rect, 1);
-
-
+	const SDL_Rect rect = (SDL_Rect){x0, y0, GP_ABS(x1 - x0) + 1, GP_ABS(y1 - y0) + 1};
+	SDL_UpdateWindowSurfaceRects(window, &rect, 1);
 
 	SDL_UnlockMutex(mutex);
 }
@@ -87,7 +71,6 @@ static void sdl2_put_event(SDL_Event *ev)
 static void sdl2_poll(struct gp_backend *self __attribute__((unused)))
 {
 	SDL_Event ev;
-
 	SDL_LockMutex(mutex);
 
 	while (SDL_PollEvent(&ev))
@@ -96,54 +79,40 @@ static void sdl2_poll(struct gp_backend *self __attribute__((unused)))
 	SDL_UnlockMutex(mutex);
 }
 
-static void sdl_wait(struct gp_backend *self __attribute__((unused)))
+static void sdl2_wait(struct gp_backend *self __attribute__((unused)))
 {
 	SDL_Event ev;
-
 	if (SDL_WaitEvent(&ev) == 1) {
 		sdl2_put_event(&ev);
 	}
-
-	/*
-
-	for (;;) {
-		if (gp_event_queue_events(&self->event_queue))
-			return;
-
-		SDL_LockMutex(mutex);
-
-		while (SDL_PollEvent(&ev))
-			sdl_put_event(&ev);
-
-		SDL_UnlockMutex(mutex);
-
-		usleep(10000);
-	}*/
 }
 
 int gp_pixmap_from_sdl2_surface(gp_pixmap *pixmap, const SDL_Surface *surf)
 {
-	/* sanity checks on the SDL surface */
+	enum gp_pixel_type pixeltype;
+
+	/* Sanity checks */
 	if (surf->format->BytesPerPixel == 0) {
 		GP_WARN("Surface->BytesPerPixel == 0");
 		return 1;
 	}
-
 	if (surf->format->BytesPerPixel > 4) {
 		GP_WARN("Surface->BytesPerPixel > 4");
 		return 1;
 	}
 
-	enum gp_pixel_type pixeltype = gp_pixel_rgb_match(surf->format->Rmask,
-							  surf->format->Gmask,
-							  surf->format->Bmask,
-							  surf->format->Ashift,
-							  surf->format->BitsPerPixel);
+	pixeltype = gp_pixel_rgb_match(
+		surf->format->Rmask,
+		surf->format->Gmask,
+		surf->format->Bmask,
+		surf->format->Ashift,
+		surf->format->BitsPerPixel
+	);
 
 	if (pixeltype == GP_PIXEL_UNKNOWN)
 		return 1;
 
-	/* basic structure and size */
+	/* Basic structure and size */
 	pixmap->pixels = surf->pixels;
 	pixmap->bpp = 8 * surf->format->BytesPerPixel;
 	pixmap->pixel_type = pixeltype;
@@ -175,7 +144,7 @@ static int sdl2_set_attr(struct gp_backend *self, enum gp_backend_attrs attr,
 		if (fullscreen == 1) {
 			flags = SDL_WINDOW_FULLSCREEN;
 		}
-		SDL_SetWindowFullscreen(window, fullscreen);
+		SDL_SetWindowFullscreen(window, flags);
 	}
 	break;
 	default:
@@ -206,30 +175,6 @@ static int sdl2_resize_ack(struct gp_backend *self __attribute__((unused)))
 
 static void sdl2_exit(struct gp_backend *self __attribute__((unused)));
 
-
-
-static void sdl2_wait(struct gp_backend *self __attribute__((unused)))
-{
-	SDL_Event ev;
-
-	SDL_WaitEvent(&ev);
-	sdl2_put_event(&ev);
-
-	// for (;;) {
-	// 	if (gp_event_queue_events(&self->event_queue))
-	// 		return;
-
-	// 	SDL_mutexP(mutex);
-
-	// 	while (SDL_PollEvent(&ev))
-	// 		sdl_put_event(&ev);
-
-	// 	SDL_mutexV(mutex);
-
-	// 	usleep(10000);
-	// }
-}
-
 static struct gp_backend backend = {
 	.name = "SDL2",
 	.flip = sdl2_flip,
@@ -245,7 +190,6 @@ static struct gp_backend backend = {
 static void sdl2_exit(struct gp_backend *self __attribute__((unused)))
 {
 	SDL_LockMutex(mutex);
-
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
 	SDL_UnlockMutex(mutex);
@@ -255,18 +199,11 @@ static void sdl2_exit(struct gp_backend *self __attribute__((unused)))
 	backend.pixmap = NULL;
 }
 
-gp_backend *gp_sdl2_init(gp_size w, gp_size h, uint8_t bpp, uint8_t flags,
+gp_backend *gp_sdl2_init(gp_size w, gp_size h, uint8_t bpp __attribute__((unused)), uint8_t flags,
                         const char *caption)
 {
 	Uint32 sdl2_flags = 0;
-	if (flags & GP_SDL2_RESIZABLE) {
-		sdl2_flags |= SDL_WINDOW_RESIZABLE;
-	}
 
-	if (flags & GP_SDL2_FULLSCREEN) {
-		sdl2_flags |= SDL_WINDOW_FULLSCREEN;
-	}
-	
 	/* SDL was already initalized */
 	if (backend.pixmap != NULL)
 		return &backend;
@@ -278,6 +215,12 @@ gp_backend *gp_sdl2_init(gp_size w, gp_size h, uint8_t bpp, uint8_t flags,
 	}
 
 	/* Window */
+	if (flags & GP_SDL2_RESIZABLE) {
+		sdl2_flags |= SDL_WINDOW_RESIZABLE;
+	}
+	if (flags & GP_SDL2_FULLSCREEN) {
+		sdl2_flags |= SDL_WINDOW_FULLSCREEN;
+	}
 	window = SDL_CreateWindow(caption, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, w, h, sdl2_flags);
 	if (window == NULL) {
 		GP_WARN("SDL_CreateWindow: %s", SDL_GetError());
@@ -285,6 +228,7 @@ gp_backend *gp_sdl2_init(gp_size w, gp_size h, uint8_t bpp, uint8_t flags,
 		return NULL;
 	}
 
+	/* Surface */
 	surface = SDL_GetWindowSurface(window);
 	if (surface == NULL) {
 		GP_WARN("SDL_GetWindowSurface: %s", SDL_GetError());
@@ -293,6 +237,7 @@ gp_backend *gp_sdl2_init(gp_size w, gp_size h, uint8_t bpp, uint8_t flags,
 		return NULL;
 	}
 
+	/* Renderer */
 	renderer = SDL_CreateSoftwareRenderer(surface);
 	if (renderer == NULL) {
 		GP_WARN("SDL_CreateRenderer: %s", SDL_GetError());
@@ -301,8 +246,10 @@ gp_backend *gp_sdl2_init(gp_size w, gp_size h, uint8_t bpp, uint8_t flags,
 		return NULL;
 	}
 
+	/* Mutex */
 	mutex = SDL_CreateMutex();
 
+	/* Pixmap */
 	if (gp_pixmap_from_sdl2_surface(&pixmap, surface)) {
 		GP_WARN("Failed to match pixel_type");
 		SDL_DestroyRenderer(renderer);
@@ -312,7 +259,6 @@ gp_backend *gp_sdl2_init(gp_size w, gp_size h, uint8_t bpp, uint8_t flags,
 	}
 
 	gp_event_queue_init(&backend.event_queue, w, h, 0);
-
 	backend.pixmap = &pixmap;
 
 	return &backend;
