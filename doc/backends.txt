@@ -13,7 +13,7 @@ Supported backends
 ------------------
 
 * Linux mmaped 'frame-buffer'
-* link:http://www.libsdl.org/[SDL]
+* link:http://www.libsdl.org/[SDL] (1/2)
 * 'X Window System'
 * link:http://aa-project.sourceforge.net/aalib/[AA-lib]
 
