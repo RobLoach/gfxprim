@@ -274,7 +274,7 @@ gp_backend *gp_sdl2_init(gp_size w __attribute__((unused)),
                         uint8_t flags __attribute__((unused)),
                         const char *caption __attribute__((unused)))
 {
-	GP_FATAL("SDL2 support not compiled in.");
+	GP_WARN("SDL2 support not compiled in.");
 	return NULL;
 }
 

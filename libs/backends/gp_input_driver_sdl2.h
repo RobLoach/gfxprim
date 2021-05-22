@@ -5,7 +5,7 @@
 
 /*
 
-  SDL input driver. Translates SDL2 events to GFXprim events.
+  SDL2 input driver. Translates SDL2 events to GFXprim events.
 
  */
 
