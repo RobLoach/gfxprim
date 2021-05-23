@@ -1,16 +1,14 @@
 TOPDIR=../..
 include $(TOPDIR)/pre.mk
 
-SOURCES=$(shell echo *.c)
+CSOURCES=$(shell echo *.c)
 
 ifneq ($(HAVE_LIBSDL),yes)
-CSOURCES=$(filter-out SDL_glue.c,$(SOURCES))
-else
-CSOURCES=$(SOURCES)
+CSOURCES:=$(filter-out SDL_glue.c,$(CSOURCES))
 endif
 
 ifneq ($(HAVE_LIBSDL2),yes)
-CSOURCES=$(filter-out SDL2_glue.c,$(CSOURCES))
+CSOURCES:=$(filter-out SDL2_glue.c,$(CSOURCES))
 endif
 
 INCLUDE=
