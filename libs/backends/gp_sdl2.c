@@ -222,7 +222,7 @@ gp_backend *gp_sdl2_init(gp_size w, gp_size h, uint8_t bpp __attribute__((unused
 		sdl2_flags |= SDL_WINDOW_FULLSCREEN;
 	}
 	window = SDL_CreateWindow(caption, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, w, h, sdl2_flags);
-	if (window == NULL) {
+	if (!window) {
 		GP_WARN("SDL_CreateWindow: %s", SDL_GetError());
 		SDL_Quit();
 		return NULL;
@@ -230,7 +230,7 @@ gp_backend *gp_sdl2_init(gp_size w, gp_size h, uint8_t bpp __attribute__((unused
 
 	/* Surface */
 	surface = SDL_GetWindowSurface(window);
-	if (surface == NULL) {
+	if (!surface) {
 		GP_WARN("SDL_GetWindowSurface: %s", SDL_GetError());
 		SDL_DestroyWindow(window);
 		SDL_Quit();
@@ -239,7 +239,7 @@ gp_backend *gp_sdl2_init(gp_size w, gp_size h, uint8_t bpp __attribute__((unused
 
 	/* Renderer */
 	renderer = SDL_CreateSoftwareRenderer(surface);
-	if (renderer == NULL) {
+	if (!renderer) {
 		GP_WARN("SDL_CreateRenderer: %s", SDL_GetError());
 		SDL_DestroyWindow(window);
 		SDL_Quit();

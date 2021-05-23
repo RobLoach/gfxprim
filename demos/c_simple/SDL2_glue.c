@@ -79,14 +79,14 @@ int main(void)
 	}
 
 	window = SDL_CreateWindow("GFXprim SDL2", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, W, H, SDL_WINDOW_RESIZABLE);
-	if (window == NULL) {
+	if (!window) {
 		fprintf(stderr, "Could not open window: %s\n", SDL_GetError());
 		SDL_Quit();
 		return 1;
 	}
 
 	surface = SDL_GetWindowSurface(window);
-	if (surface == NULL) {
+	if (!surface) {
 		fprintf(stderr, "Could not open display: %s\n", SDL_GetError());
 		SDL_DestroyWindow(window);
 		SDL_Quit();
@@ -94,7 +94,7 @@ int main(void)
 	}
 
 	renderer = SDL_CreateSoftwareRenderer(surface);
-	if (renderer == NULL) {
+	if (!renderer) {
 		fprintf(stderr, "Could not open renderer: %s\n", SDL_GetError());
 		SDL_FreeSurface(surface);
 		SDL_DestroyWindow(window);
