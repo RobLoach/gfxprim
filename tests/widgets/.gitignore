@@ -1,8 +1,14 @@
 tattr
+json
+json_benchmark
 size_units
 tbox
 checkbox
+checkbox_json
 button
+button_json
 tabs
 label
+label_json
 grid
+grid_json

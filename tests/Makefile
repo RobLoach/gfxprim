@@ -1,13 +1,9 @@
 TOPDIR=..
 include $(TOPDIR)/pre.mk
 
-SUBDIRS=core framework loaders gfx filters input widgets utils
+SUBDIRS=core framework loaders gfx filters input utils widgets
+TEST_DIRS=$(filter-out framework, $(SUBDIRS))
 
-loaders: framework
-gfx: framework
-core: framework
-filters: framework
-input: framework
-widgets: framework
+$(TEST_DIRS): framework
 
 include $(TOPDIR)/post.mk

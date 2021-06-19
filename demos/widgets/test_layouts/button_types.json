@@ -263,6 +263,13 @@
    "type": "button",
    "btype": "save",
    "align": "fill"
+  },
+  {
+   "type": "button",
+   "btype": "randomize",
+   "align": "fill"
+  },
+  {
   }
  ]
 }
